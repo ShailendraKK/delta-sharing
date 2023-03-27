@@ -33,3 +33,33 @@ After installing jar, the JUnit test can be run by following below steps:
 cd jarTest
 mvn test
 ```
+
+To sync the fork with upstream repo, follow the steps given below:
+
+1. Set up upstream
+
+```
+git remote add upstream https://github.com/delta-io/delta-sharing.git
+```
+
+2. Fetch the branches and their respective commits from the upstream repository
+
+```
+git fetch upstream
+``
+
+3. Check out your fork's local default branch - in this case, we use main
+
+```
+git checkout main
+```
+
+4. Merge the changes from the upstream default branch - in this case, upstream/main - into your local default branch
+
+```
+git merge upstream/main
+```
+
+5. If there are any merge conflicts, resolve them.
+
+For more details on how to sync the fork, follow https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork
