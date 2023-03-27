@@ -34,6 +34,7 @@ cd jarTest
 mvn test
 ```
 
+
 To sync the fork with upstream repo, follow the steps given below:
 
 1. Set up upstream
@@ -46,7 +47,7 @@ git remote add upstream https://github.com/delta-io/delta-sharing.git
 
 ```
 git fetch upstream
-``
+```
 
 3. Check out your fork's local default branch - in this case, we use main
 
