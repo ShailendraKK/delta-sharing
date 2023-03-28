@@ -29,7 +29,6 @@ public class jarTest {
         SharedTableManager tableManager = getSharedTableManager();
         Option<String> nextPageToken= Option.apply(null);
         Option<Object> maxResult = Option.apply(500);
-        //Tuple2<Seq<Share>, Option<String>> result = tableManager.listShares(nextPageToken, maxResult);
         var result = tableManager.listShares(nextPageToken, maxResult);
 
         Seq<Share> shares = result._1();
@@ -86,8 +85,9 @@ public class jarTest {
         Option<Object> noneObject = Option.empty();
         Option<String> nextPageToken= Option.apply(null);
         Option<String> timeStamp = Option.apply(null);
+        Option<String> jsonPredicateHint = Option.apply(null);
         Seq<String> predicateHint = JavaConverters.asScalaBuffer(Arrays.asList("data", ">=", "'2021-01-01'")).seq();
-        var result = tableLoader.loadTable(tableConfig).query(true,predicateHint,noneObject,noneObject,timeStamp,noneObject);
+        var result = tableLoader.loadTable(tableConfig).query(true,predicateHint,jsonPredicateHint,noneObject,noneObject,timeStamp,noneObject);
         Seq<SingleAction> actions = result._2();
         int i=0;
         for (SingleAction action : JavaConverters.seqAsJavaList(actions)) {

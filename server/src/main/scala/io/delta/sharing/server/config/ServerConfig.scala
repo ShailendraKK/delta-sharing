@@ -24,6 +24,7 @@ import scala.beans.BeanProperty
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 /** A trait that requires to implement */
 trait ConfigItem {
@@ -57,7 +58,9 @@ case class ServerConfig(
     // Whether to evaluate user provided `jsonPredicateHints`
     @BeanProperty var evaluateJsonPredicateHints: Boolean,
     // The timeout of an incoming web request in seconds. Set to 0 for no timeout
-    @BeanProperty var requestTimeoutSeconds: Long
+    @BeanProperty var requestTimeoutSeconds: Long,
+    // The configuration for hdlfs
+    @BeanProperty var hdlfsConfig: HDLFSConfig
 ) extends ConfigItem {
   import ServerConfig._
 
@@ -76,7 +79,8 @@ case class ServerConfig(
       stalenessAcceptable = false,
       evaluatePredicateHints = false,
       evaluateJsonPredicateHints = false,
-      requestTimeoutSeconds = 30
+      requestTimeoutSeconds = 30,
+      hdlfsConfig = null
     )
   }
 
@@ -94,12 +98,35 @@ case class ServerConfig(
     }
   }
 
+  private def checkAndModifyURL(location: String): String = {
+    if (location.startsWith("hdlfs")) {
+      // scalastyle:off println
+      var path = location
+      path = path.split("/").drop(3).mkString("/")
+      println(path)
+      var newlocation = hdlfsConfig.bucket + "/" + path + "/"
+      println(newlocation)
+      // scalastyle:on println
+      newlocation
+    } else {
+        location
+    }
+  }
+
+  private def checkFilePath(): Unit = {
+    // scalastyle:off println
+    shares.forEach(share => share.schemas.forEach(schema => schema.tables.forEach(table => table.location = checkAndModifyURL(table.location))))
+    shares.forEach(share => share.schemas.forEach(schema => schema.tables.forEach(table => println(table.location))))
+    // scalastyle:on println
+  }
+
   def save(configFile: String): Unit = {
     ServerConfig.save(this, configFile)
   }
 
   override def checkConfig(): Unit = {
     checkVersion()
+    checkFilePath()
     shares.forEach(_.checkConfig())
     if (authorization != null) {
       authorization.checkConfig()
@@ -134,6 +161,15 @@ object ServerConfig{
       throw new IOException("The server config file must be a yml or yaml file")
     }
   }
+
+  def loadJson(configJson: String): ServerConfig = {
+    val mapper = new ObjectMapper()
+    mapper.registerModule(DefaultScalaModule)
+    val serverConfig = mapper.readValue(configJson, classOf[ServerConfig])
+    serverConfig.checkConfig()
+    serverConfig
+  }
+
 
   /**
    * Serialize the [[ServerConfig]] object to the config file. If the file name ends with `.yaml`
@@ -220,6 +256,7 @@ case class SchemaConfig(
 
 case class TableConfig(
     @BeanProperty var name: String,
+    // Change hdlfs to s3 link
     @BeanProperty var location: String,
     @BeanProperty var id: String = "",
     @BeanProperty var cdfEnabled: Boolean = false,
@@ -236,5 +273,28 @@ case class TableConfig(
     if (location == null) {
       throw new IllegalArgumentException("'location' in a table must be provided")
     }
+  }
+}
+
+case class HDLFSConfig(
+    @BeanProperty var bucket: String,
+    // @BeanProperty var AWS_SECRET_ACCESS_KEY: String,
+    // @BeanProperty var AWS_ACCESS_KEY_ID: String,
+    @BeanProperty var AWS_DEFAULT_REGION: String = "eu-central-1") extends ConfigItem {
+
+  def this() {
+    this(null, null)
+  }
+
+  override def checkConfig(): Unit = {
+    if (bucket == null) {
+      throw new IllegalArgumentException("'bucket' in hdlfs config must be provided")
+    }
+    // if (AWS_SECRET_ACCESS_KEY == null) {
+    //   throw new IllegalArgumentException("'AWS_SECRET_ACCESS_KEY' in hdlfs config must be provided")
+    // }
+    // if (AWS_ACCESS_KEY_ID == null) {
+    //   throw new IllegalArgumentException("'AWS_ACCESS_KEY_ID' in hdlfs config must be provided")
+    // }
   }
 }
