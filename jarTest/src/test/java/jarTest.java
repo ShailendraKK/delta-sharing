@@ -131,7 +131,7 @@ public class jarTest {
                 "          \"tables\": [\n" +
                 "            {\n" +
                 "              \"name\": \"test1\",\n" +
-                "              \"location\": \"s3a://hdl-test-data-eu-central-1/delta_lake/tab/\"\n" +
+                "              \"location\": \"<s3url>\"\n" +
                 "            }\n" +
                 "          ]\n" +
                 "        }\n" +
@@ -145,7 +145,7 @@ public class jarTest {
                 "          \"tables\": [\n" +
                 "            {\n" +
                 "              \"name\": \"test2\",\n" +
-                "              \"location\": \"s3a://hdl-test-data-eu-central-1/delta_lake/tab_demo1/\"\n" +
+                "              \"location\": \"<s3url>\"\n" +
                 "            }\n" +
                 "          ]\n" +
                 "        }\n" +
