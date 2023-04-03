@@ -280,7 +280,7 @@ case class HDLFSConfig(
     @BeanProperty var bucket: String,
     // @BeanProperty var AWS_SECRET_ACCESS_KEY: String,
     // @BeanProperty var AWS_ACCESS_KEY_ID: String,
-    @BeanProperty var AWS_DEFAULT_REGION: String = "eu-central-1") extends ConfigItem {
+    @BeanProperty var aws_default_region: String = "eu-central-1") extends ConfigItem {
 
   def this() {
     this(null, null)
